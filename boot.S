@@ -1,0 +1,138 @@
+
+.section .text
+.globl _start
+.code16
+
+_start:
+	
+	cli
+	ljmp $0, $Begin
+
+Begin:
+	mov $0x00, %ax
+	mov %ax, %bx
+	mov %ax, %cx
+	mov %ax, %dx
+	mov $0x7c00, %bp
+	mov %bp, %sp
+	sti
+
+clear_screen:
+	pusha
+
+	mov $0x0600, %ax
+	mov $0x0F, %bh			#Background 0=black, Text F=white
+	mov $0x0000, %cx
+	mov $0x184F, %dx
+	int $0x10
+	
+	xor %ax,%ax
+	
+	mov $0x02, %ah
+	mov $0x00, %bh
+	mov $0x0000, %dx
+	int $0x10
+
+	popa
+
+/*
+	mov $'A', %al
+	mov $0x0E, %ah
+	int $0x10
+*/
+PROTECTED_MODE:
+	
+	.equ CODE_SEG, 8
+	.equ DATA_SEG, gdt_data - gdt_start
+
+	lgdt gdt_descriptor
+	mov %cr0, %eax
+	orl $0x01, %eax
+	mov %eax, %cr0
+
+	ljmp $CODE_SEG, $protected_mode
+
+gdt_start:
+gdt_null:
+	.quad 0x00
+gdt_code:
+	.word 0xFFFF
+	.word 0x00
+	.byte 0x00
+	.byte 0b10011010
+	.byte 0b11001111
+	.byte 0x00
+gdt_data:
+	.word 0xFFFF
+	.word 0x00
+	.byte 0x00
+	.byte 0b10010010
+	.byte 0b11001111
+	.byte 0x00
+gdt_end:
+gdt_descriptor:
+	.word gdt_end - gdt_start
+	.long gdt_start
+
+
+.code32
+protected_mode:
+	
+	mov $0x01, %eax
+	mov $0x64, %ecx
+	mov $0x100000, %edi
+	
+ata_read:
+	mov %eax, %ebx
+	shr $24, %eax
+	or $0xE0, %eax
+	mov $0x1F6, %dx		
+	out %al, %dx		
+
+	
+	mov %ecx, %eax
+	mov $0x1F2, %edx
+	out %al, %dx
+
+	mov %ebx, %eax
+	mov $0x1F3, %dx
+	out %al, %dx
+
+	mov %ebx, %eax
+	mov $0x1F4, %dx
+	shr $0x08, %eax
+	out %al, %dx
+
+	mov %ebx, %eax
+	mov $0x1F5, %dx
+	shr $0x10, %eax
+	out %al, %dx
+
+	mov $0x1F7, %dx
+	mov $0x20, %al
+	out %al, %dx
+
+
+next_sector:
+	push %ecx
+
+try_again:
+	mov $0x1F7, %dx
+	in %dx, %ax
+	test $0x08, %ax
+	jz try_again
+	
+	mov $256, %ax
+	mov $0x1F0, %dx
+	
+	rep insw
+
+	pop %ecx
+	loop next_sector
+	
+	jmp $CODE_SEG, $0x100000
+	
+	. = _start + 510
+	.byte 0x55
+	.byte 0xaa
+	
