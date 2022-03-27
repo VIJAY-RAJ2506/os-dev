@@ -17,24 +17,6 @@ Begin:
 	mov %bp, %sp
 	sti
 
-clear_screen:
-	pusha
-
-	mov $0x0600, %ax
-	mov $0x0F, %bh			#Background 0=black, Text F=white
-	mov $0x0000, %cx
-	mov $0x184F, %dx
-	int $0x10
-
-	xor %ax,%ax
-
-	mov $0x02, %ah
-	mov $0x00, %bh
-	mov $0x0000, %dx
-	int $0x10
-
-	popa
-
 
 PROTECTED_MODE:
 
@@ -128,7 +110,7 @@ try_again:
 
 	ljmp $CODE_SEG, $0x100000
 
-	hlt
+	.fill 510-(.-_start),1,0
 
 	. = _start + 510
 	.byte 0x55

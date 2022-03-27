@@ -4,29 +4,27 @@ SECTIONS
 {
 	. = 1M;
 	
-	.text : ALIGN(4096)
+	.text BLOCK(4K) : ALIGN(4K)
 	{
-		*kernel.asm.o(.text)
-		. = ALIGN(512);
 		*(.text)
 	}
 
-	.rodata : ALIGN(4096)
+	.rodata BLOCK(4K) : ALIGN(4K)
 	{
 		*(.rodata)
 	}
 
-	.data : ALIGN(4096)
+	.data BLOCK(4K) : ALIGN(4K)
 	{
 		*(.data)
 	}
 
-	.bss : ALIGN(4096)
+	.bss BLOCK(4K) : ALIGN(4K)
 	{
 		*(.bss)
 	}
 
-	.asm : ALIGN(4096)
+	.asm BLOCK(4K) : ALIGN(4K)
 	{
 		*(.asm)
 	}

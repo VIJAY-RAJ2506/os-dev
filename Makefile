@@ -31,12 +31,11 @@ $(KERNEL_BIN): $(KERNEL_OBJ) $(FILES)
 $(KERNEL_OBJ): ./src/boot/kernel.S
 	$(GAS) -g $< -o $@
 
-$(BOOT_OBJ): ./src/boot/boot.S
-	$(GAS) $< -o $@
-
 $(BOOT_BIN): $(BOOT_OBJ)
 	$(LD) -Ttext 0x7c00 --oformat=binary $< -o $@
 
+$(BOOT_OBJ): ./src/boot/boot.S
+	$(GAS) $< -o $@
 
 clean:
 	rm ./build/*.o

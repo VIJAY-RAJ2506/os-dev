@@ -26,5 +26,6 @@ enum color_code {
 
 void kernel_init();
 void terminal_putchar(int x, int y, unsigned char c, enum color_code color);
-void print(const char *str);
+static void print(char *str);
+void test_func();
 #endif

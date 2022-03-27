@@ -22,11 +22,10 @@ void terminal_putchar(int x, int y, unsigned char c, enum color_code color)
 
 void clear_screen()
 {
-	vga_mem=(uint16_t*)VGA_MEM;
-
-	for(int i=0; i<VGA_HEIGHT; i++) {
-		for(int j=0; j<VGA_WIDTH; j++)
-			terminal_putchar(j,i,' ',VGA_COLOR_BLACK);
+	vga_mem = (uint16_t*)VGA_MEM;
+	for (int i = 0; i < VGA_WIDTH; i++) {
+		for (int j = 0; j < VGA_HEIGHT; j++)
+			terminal_putchar(i, j, ' ', VGA_COLOR_BLACK);
 	}
 }
 
@@ -47,26 +46,25 @@ void terminal_write(unsigned char c, enum color_code color)
 	return;
 }
 
-size_t strlen(const char *str)
+size_t strlen(char *str)
 {
+	size_t len = 0;
 	
-	size_t len=0;
-	while(str[len])
-	{
+	while(str[len]) {
 		len++;
 	}
-
 	return len;
 }
 
-void print(const char *str)
-{
-	size_t len = strlen(str);
-	for (int i = 0; i < len; i++)
-		terminal_write(str[i],VGA_COLOR_WHITE);
+static void print(char *str) {
+
+	size_t len = 0;
+	
+	for(int i = 0; i < len; i++)
+		terminal_write(str[i], VGA_COLOR_WHITE);	
 }
 
 void kernel_init() {
 	clear_screen();
-	print("Hello");
+	print("Hello World");
 }
